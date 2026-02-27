@@ -10,7 +10,7 @@ let cashImg;
 let diamondsImg;
 let jwelleryImg;
 let swordImg;
-let treasureCollection;
+let treasureCollection = 0;
 let cashGroup;
 let diamondsGroup;
 let jwelleryGroup;
@@ -48,17 +48,57 @@ function setup(){
 
 function draw(){
     background(0);
-    if(path.y > height){
-        path.y = height/2
-    }
-    boy.x = World.mouseX;
-    edges = createEdgeSprites();
-    boy.collide(edges);
-    createCash();
-    createDiamonds();
-    createJwellery();
+    if(gameState === PLAY){
+        if(path.y > height){
+            path.y = height/2
+        }
+        boy.x = World.mouseX;
+        edges = createEdgeSprites();
+        boy.collide(edges);
+        createCash();
+        createDiamonds();
+        createJwellery();
+        createSword();
 
+        if(cashGroup.isTouching(boy)){
+            cashGroup.destroyEach();
+            treasureCollection = treasureCollection + 50;
+        }
+        else if(diamondsGroup.isTouching(boy)){
+            diamondsGroup.destroyEach();
+            treasureCollection = treasureCollection + 100;
+        }
+        else if(jwelleryGroup.isTouching(boy)){
+            jwelleryGroup.destroyEach();
+            treasureCollection = treasureCollection + 150;
+        }
+        else if(swordGroup.isTouching(boy)){
+            gameState = END;
+            boy.addAnimation("run", endImg);
+            boy.x = width /2;
+            boy.y = height /2;
+            boy.scale = 0.6;
+
+            cashGroup.destroyEach();
+            diamondsGroup.destroyEach();
+            jwelleryGroup.destroyEach();
+            swordGroup.destroyEach();
+
+            cashGroup.setVelocityYEach(0);
+            diamondsGroup.setVelocityYEach(0);
+            jwelleryGroup.setVelocityYEach(0);
+            swordGroup.setVelocityYEach(0);
+        }
+
+    }
+    
     drawSprites();
+    textSize(20);
+    fill(255);
+    text('tesouros: '+ treasureCollection, width -200, 30);
+
+
+    
 }
 
 function createCash(){
@@ -91,5 +131,16 @@ function createJwellery(){
         jwellery.velocityY = 5;
         jwellery.lifetime = 5/height;
         jwelleryGroup.add(jwellery);
+    }
+}
+
+function createSword(){
+    if(World.frameCount % 530 == 0){
+        let sword = createSprite(Math.round(random(50,width - 50),40,10,10));
+        sword.addImage(swordImg);
+        sword.scale = 0.1;
+        sword.velocityY = 4;
+        sword.lifetime = 5/height;
+        swordGroup.add(sword);
     }
 }
